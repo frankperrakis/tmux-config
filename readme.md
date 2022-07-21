@@ -1,6 +1,8 @@
-Tmux Configuration [Tweaked to work with tmux >=3 and tested in ubuntu 22.04/ Arch linux / Debian Testing]
+Tmux Configuration
 =====================
 Tmux configuration, that supercharges your [tmux](https://tmux.github.io/) and builds cozy and cool terminal environment.
+
+Tweaked original config from [Samoshkin](https://github.com/samoshkin) to work with tmux >=3 , added my own addons and custom keybindings.
 
 ![intro](https://user-images.githubusercontent.com/768858/33152741-ec5f1270-cfe6-11e7-9570-6d17330a83aa.gif)
 
@@ -11,7 +13,7 @@ Table of contents
 1. [Installation](#installation)
 1. [General settings](#general-settings)
 1. [Key bindings](#key-bindings)
-1. [Status line](#status-line)
+1. [Custom Key bindings](#custom-key-bindings)
 1. [Nested tmux sessions](#nested-tmux-sessions)
 1. [Copy mode](#copy-mode)
 1. [Clipboard integration](#clipboard-integration)
@@ -35,7 +37,7 @@ Features
 - highlight focused pane
 - merge current session with existing one (move all windows)
 - configurable visual theme/colors, with some elements borrowed from [Powerline](https://github.com/powerline/powerline)
-- integration with 3rd party plugins: [tmux-sidebar](https://github.com/tmux-plugins/tmux-sidebar), [tmux-copycat](https://github.com/tmux-plugins/tmux-copycat), [tmux-open](https://github.com/tmux-plugins/tmux-open), [tmux-plugin-sysstat](https://github.com/samoshkin/tmux-plugin-sysstat)
+- integration with 3rd party plugins: [tmux-sidebar](https://github.com/tmux-plugins/tmux-sidebar), [tmux-copycat](https://github.com/tmux-plugins/tmux-copycat), [tmux-open](https://github.com/tmux-plugins/tmux-open), [tmux-plugin-sysstat](https://github.com/samoshkin/tmux-plugin-sysstat), [tmux-resurrect](https://github.com/tmux-plugins/resurrect), [tmux-logging](https://github.com/tmux-plugins/logging), [tmux-weather](https://github.com/xamut/tmux-weather), [tmux-network-bandwidth](https://github.com/xamut/tmux-network-bandwidth), [tmux-suspend](https://github.com/MunifTanjim/tmux-suspend)
 
 **Status line widgets**:
 
@@ -48,17 +50,33 @@ Features
 - online/offline visual indicator
 - toggle visibility of status line
 
-
 Installation
 -------------
 Prerequisites:
 - tmux >= "v2.4"
-- OSX, Linux (tested on Ubuntu 14 and CentOS7), FreeBSD (tested on 11.1)
+- OSX, Linux (tested on Ubuntu 22.04, Fedora 37 , Arch )
+- packages for addons : ansifilter, gawk, sed, coreutils, net-tool, curl, wget, git, iputils-ping
 
-Personally, I use it on OSX 10.11.5 El Capitan through iTerm2.
+To install dependencies try this on Ubuntu
+```
+sudo apt-get update  \
+  && sudo apt-get install -qy --no-install-recommends \
+    tmux \
+    git \
+    iputils-ping \
+    wget \
+    curl \
+    tmux \
+    gawk \ 
+    net-tools \
+    coreutils \
+    sed
+```
 
-On OSX you can install latest 2.6 version with `brew install tmux`. On Linux it's better to install from source, because official repositories usually contain outdated version. For example, CentOS7 - v1.8 from base repo, Ubuntu 14 - v1.8 from trusty/main. For how to install from source, see this [gist](https://gist.github.com/P7h/91e14096374075f5316e) or just google it.
-
+On Macos 
+```
+brew install ansifilter gnu-sed gawk coreutils tmux git
+```
 
 To install tmux-config:
 ```
@@ -77,7 +95,6 @@ Finally, you can jump into a new tmux session:
 ```
 tmux new
 ```
-
 
 General settings
 ----------------
@@ -281,12 +298,27 @@ If you are an iTerm2 user, third column describes the keybinding of similar  "ac
         <td>Monitor current window for silence by entering silence period</td>
         <td>-</td>
     </tr>
+</table>
+
+Custom Key bindings
+-------------------
+<table>
+    <tr>
+        <td nowrap><b>tmux key</b></td>
+        <td><b>Description</b></td>
+        <td><b>iTerm2 key</b></td>
+    </tr>
     <tr>
         <td><code>&lt;prefix&gt; F10</code></td>
         <td>Switch off all key binding and prefix hanling in current window. See "Nested sessions" paragraph for more info</td>
         <td>-</td>
     </tr>
-        <tr>
+    <tr>
+        <td><code>&lt;prefix&gt; F8</code></td>
+        <td>Tmux Suspend</td>
+        <td>-</td>
+    </tr>
+    <tr>
         <td><code>&lt;prefix&gt; SS</code></td>
         <td>Save session using tmux resurrect addon</td>
         <td>-</td>
@@ -297,21 +329,28 @@ If you are an iTerm2 user, third column describes the keybinding of similar  "ac
         <td>Reload saved session using tmux resurrect addon</td>
         <td>-</td>
     </tr>
+    </tr>
+        <tr>
+        <td><code>&lt;prefix&gt; shift + p</code></td>
+        <td>Start/Stop logging in current panel</td>
+        <td>-</td>
+    </tr>
+    </tr>
+        <tr>
+        <td><code>&lt;prefix&gt; alt + p</code></td>
+        <td>Save visible text, in the current pane. Equivalent of a "textual screenshot"</td>
+        <td>-</td>
+    </tr>
+    </tr>
+        <tr>
+        <td><code>&lt;prefix&gt; alt + shift + p</code></td>
+        <td>Save complete pane history to a file. Convenient if you retroactively remember you need to log/save all the work</td>
+        <td>-</td>
+    </tr>
 </table>
-
 
 Status line
 -----------
-
-I've started with Powerline as a status line, but then realized it's too fat for my Macbook 15'' display, it hardly can fit all those fancy arrows, widgets and separators, so that I can only see one window "tab".
-
-So I decide to make my feet wet, with the idea to keep it dense, and include essential widgets. Sometimes it tries to replicate OSX topbar (battery, date time).
-
-Left part:
-![status line left](https://user-images.githubusercontent.com/768858/33151594-59db6a8e-cfe1-11e7-8a36-476fe0b416b3.png)
-
-Right part:
-![status line right](https://user-images.githubusercontent.com/768858/33151608-6978de72-cfe1-11e7-829a-e303e31e8c16.png)
 
 The left part contains only current session name.
 
@@ -319,11 +358,12 @@ Window tabs use Powerline arrows glyphs, so you need to install Powerline enable
 
 The right part of status line consists of following components:
 
-- CPU, memory usage, system load average metrics. Powered by [tmux-plugin-sysstat](https://github.com/samoshkin/tmux-plugin-sysstat) (dislaimed, that's my own development, because I haven't managed to find any good plugin with CPU and memory/swap metrics)
+- CPU, memory usage, swap usage . Powered by [tmux-plugin-sysstat](https://github.com/samoshkin/tmux-plugin-sysstat)
+- network Speed . Powered by [tmux-network-bandwidth](https://github.com/xamut/tmux-network-bandwidth)
 - username and hostname (invaluable when you SSH onto remote host)
 - current date time
-- battery information
-- visual indicator when you press prefix key: `[^A]`.
+- weather . Powered by [tmux-weather](https://github.com/xamut/tmux-weather)
+- visual indicator when you press prefix key: `[^Z]`.
 - visual indicator when pane is zoomed: `[Z]`
 - online/offline visual indicator (just pings `google.com`)
 
@@ -489,8 +529,12 @@ You can then go full screen in iTerm, so iTerm tabs and frame do not distract yo
 
 Docker Test
 -----------
-Just run this to test on your local pc without any changes (Requires [Docker](https://docs.docker.com/engine/install/) to be installed)
+
+You can test this configuration (or anychanges you make) on your local pc without any changes (Requires [Docker](https://docs.docker.com/engine/install/) to be installed)
+
+Just run 
 ```
 docker build -t tmux-test .
 docker run -it tmux-test
 ```
+Remember to rebuild your container everytime you make changes
